@@ -1,0 +1,79 @@
+/**
+ *  Momentary Button Tile
+ *
+ *  Author: Wes Bornor
+ *
+ *  Date: 2013-05-01
+ */
+metadata {
+	// Automatically generated. Make future change here.
+	definition (name: "Arduino Shield Device Handler", author: "wbornor@gmail.com") {
+
+		command "pushLeft"
+		command "pushRight"
+	}
+
+	// simulator metadata
+	simulator {
+	}
+
+	// UI tile definitions
+	tiles {
+		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
+            state "waiting", label: 'Chrissie', action: "pushRight", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+			state "pushed", label: 'Chrissie', action: "pushLeft", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
+		}
+        
+		main "rightDoor"
+		details "rightDoor"
+	}
+}
+
+def parse(String description) {
+	
+    def name = null
+	def value = zigbee.parse(description)?.text
+    log.debug "Value is ${value}"
+	def linkText = getLinkText(device)
+	def descriptionText = getDescriptionText(description, linkText, value)
+	def handlerName = value
+	def isStateChange = value != "ping"
+	def displayed = value && isStateChange
+    
+    def incoming_cmd = value.split()
+    
+    name = incoming_cmd[0]
+    value = incoming_cmd[1]
+    
+	def result = [
+		value: value,
+        name: value != "ping" ? name : null,
+		handlerName: handlerName,
+		linkText: linkText,
+		descriptionText: descriptionText,
+		isStateChange: isStateChange,
+		displayed: displayed
+	]
+ 	log.debug result
+	return result
+}
+
+def pushRight() {
+	log.debug "Executing 'pushRight'"
+    zigbee.smartShield(text: "pushRight").format()
+	//sendEvent(name: "garageB", value: "on", isStateChange: true, display: false)
+	//sendEvent(name: "garageB", value: "off", isStateChange: true, display: false)
+	//sendEvent(name: "momentary", value: "pushed", isStateChange: true)
+}
+
+/*
+def on() {
+	log.debug "Executing 'on'"
+	push()
+}
+
+def off() {
+	log.debug "Executing 'off'"
+	push()
+}
+*/
