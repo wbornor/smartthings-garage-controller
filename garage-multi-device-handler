@@ -1,0 +1,65 @@
+/**
+ *  Garage Multi
+ *
+ *  Author: Wesley Bornor
+ *  Date: 2014-04-13
+ */
+ // for the UI
+metadata {
+	definition (name: "Garage Multi", author: "Wesley Bornor") {
+		capability "Switch"
+		capability "Momentary"
+		capability "Switch Level"
+		capability "Relay Switch"
+	}
+
+	simulator {
+		// TODO: define status and reply messages here
+	}
+
+	tiles {
+		// TODO: define your main and details tiles here
+	}
+}
+
+// parse events into attributes
+def parse(String description) {
+	log.debug "Parsing '${description}'"
+	// TODO: handle 'switch' attribute
+	// TODO: handle 'level' attribute
+	// TODO: handle 'switch' attribute
+
+}
+
+// handle commands
+def on() {
+	log.debug "Executing 'on'"
+	// TODO: handle 'on' command
+}
+
+def off() {
+	log.debug "Executing 'off'"
+	// TODO: handle 'off' command
+}
+
+def push() {
+	log.debug "Executing 'push'"
+	// TODO: handle 'push' command
+}
+
+def setLevel() {
+	log.debug "Executing 'setLevel'"
+	// TODO: handle 'setLevel' command
+}
+
+def on() {
+	log.debug "Executing 'on'"
+	// TODO: handle 'on' command
+}
+
+def off() {
+	log.debug "Executing 'off'"
+	// TODO: handle 'off' command
+}
+
+
