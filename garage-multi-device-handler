@@ -18,7 +18,13 @@ metadata {
 	}
 
 	tiles {
-		// TODO: define your main and details tiles here
+		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
+                	state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+			state "pushed", label: 'Chrissie', action: "push", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
+		}
+        
+		main "rightDoor"
+		details "rightDoor"
 	}
 }
 
@@ -30,6 +36,36 @@ def parse(String description) {
 	// TODO: handle 'switch' attribute
 
 }
+
+def parse(String description) {
+
+	def name = null
+	def value = zigbee.parse(description)?.text
+	log.debug "Value is ${value}"
+	def linkText = getLinkText(device)
+	def descriptionText = getDescriptionText(description, linkText, value)
+	def handlerName = value
+	def isStateChange = value != "ping"
+	def displayed = value && isStateChange
+    
+	def incoming_cmd = value.split()
+    
+	name = incoming_cmd[0]	
+	value = incoming_cmd[1]
+    
+    	def result = [
+		value: value,
+        	name: value != "ping" ? name : null,
+		handlerName: handlerName,
+		linkText: linkText,
+		descriptionText: descriptionText,
+		isStateChange: isStateChange,
+		displayed: displayed
+    	]
+    	log.debug result
+	return result
+}
+
 
 // handle commands
 def on() {
@@ -44,7 +80,7 @@ def off() {
 
 def push() {
 	log.debug "Executing 'push'"
-	// TODO: handle 'push' command
+        zigbee.smartShield(text: "pushRight").format()
 }
 
 def setLevel() {
