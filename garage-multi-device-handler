@@ -1,0 +1,100 @@
+/**
+ *  Garage Multi
+ *
+ *  Author: Wesley Bornor
+ *  Date: 2014-04-13
+ */
+ // for the UI
+metadata {
+	definition (name: "Garage Multi", author: "Wesley Bornor") {
+		capability "Switch"
+		capability "Momentary"
+		capability "Switch Level"
+		capability "Relay Switch"
+	}
+
+	simulator {
+		// TODO: define status and reply messages here
+	}
+
+	tiles {
+		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
+			state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+			state "pushed", label: 'Chrissie', action: "push", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
+		}
+		standardTile("interiorLight", "device.interiorLight", width: 1, height: 1, canChangeIcon: true) {
+			state "on", label: 'ON', action: "on", icon:"st.Lighting.light10", backgroundColor: "#79b821", nextState: "off"
+			state "off", label: 'OFF', action: "off", icon: "st.Lighting.light10", backgroundColor: "#FFFFFF", nextState: "on"
+		}
+		controlTile("exteriorlLevelSliderControl", "device.level", "slider", height: 1, width: 1, inactiveLabel: false) {
+			state "level", action:"switch level.setLevel"
+		}
+
+		main(["interiorLight"])
+		details(["rightDoor", "interiorLight", "exteriorlLevelSliderControl"])
+	}
+}
+
+def parse(String description) {
+
+	def name = null
+	def value = zigbee.parse(description)?.text
+	log.debug "Value is ${value}"
+	def linkText = getLinkText(device)
+	def descriptionText = getDescriptionText(description, linkText, value)
+	def handlerName = value
+	def isStateChange = value != "ping"
+	def displayed = value && isStateChange
+    
+	def incoming_cmd = value.split()
+    
+	name = incoming_cmd[0]	
+	value = incoming_cmd[1]
+    
+    	def result = [
+		value: value,
+        	name: value != "ping" ? name : null,
+		handlerName: handlerName,
+		linkText: linkText,
+		descriptionText: descriptionText,
+		isStateChange: isStateChange,
+		displayed: displayed
+    	]
+    	log.debug result
+	return result
+}
+
+
+// handle commands
+def on() {
+    log.debug "Executing 'on'"
+	zigbee.smartShield(text: "on").format()
+}
+
+def off() {
+    log.debug "Executing 'off'"
+	zigbee.smartShield(text: "off").format()
+}
+
+def push() {
+	log.debug "Executing 'push'"
+	zigbee.smartShield(text: "pushRight").format()
+}
+
+def setLevel() {
+	log.debug "Executing 'setLevel'"
+	// TODO: handle 'setLevel' command
+}
+
+def setLevel(value) {
+	log.debug "Executing 'setLevel'"
+	delayBetween ([zwave.basicV1.basicSet(value: value).format(), zwave.switchMultilevelV1.switchMultilevelGet().format()], 5000)
+}
+
+def setLevel(value, duration) {
+	log.debug "Executing 'setLevel'"
+	def dimmingDuration = duration < 128 ? duration : 128 + Math.round(duration / 60)
+	zwave.switchMultilevelV2.switchMultilevelSet(value: value, dimmingDuration: dimmingDuration).format()
+}
+
+
