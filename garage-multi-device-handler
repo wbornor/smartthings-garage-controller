@@ -19,12 +19,12 @@ metadata {
 
 	tiles {
 		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
-            state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+			state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
 			state "pushed", label: 'Chrissie', action: "push", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
 		}
-        standardTile("exteriorLight", "device.exteriorLight", width: 1, height: 1, canChangeIcon: true) {
-            state "on", label: 'Exterior', action: "on", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "off"
-			state "off", label: 'Exterior', action: "off", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "on"
+		standardTile("exteriorLight", "device.exteriorLight", width: 1, height: 1, canChangeIcon: true) {
+			state "on", label: 'ON', action: "on", icon:"st.Lighting.light10", backgroundColor: "#FFFFFF", nextState: "off"
+			state "off", label: 'OFF', action: "off", icon: "st.Lighting.light10", backgroundColor: "#79b821", nextState: "on"
 		}
         
 		main "exteriorLight"
@@ -82,6 +82,3 @@ def setLevel() {
 	log.debug "Executing 'setLevel'"
 	// TODO: handle 'setLevel' command
 }
-
-
-
