@@ -19,12 +19,16 @@ metadata {
 
 	tiles {
 		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
-			state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+            state "waiting", label: 'Chrissie', action: "push", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
 			state "pushed", label: 'Chrissie', action: "push", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
 		}
+        standardTile("exteriorLight", "device.exteriorLight", width: 1, height: 1, canChangeIcon: true) {
+            state "on", label: 'Exterior', action: "on", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "off"
+			state "off", label: 'Exterior', action: "off", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "on"
+		}
         
-		main "rightDoor"
-		details "rightDoor"
+		main "exteriorLight"
+		details "rightDoor, exteriorLight"
 	}
 }
 
@@ -60,18 +64,18 @@ def parse(String description) {
 
 // handle commands
 def on() {
-	log.debug "Executing 'on'"
-	// TODO: handle 'on' command
+    log.debug "Executing 'on'"
+	zigbee.smartShield(text: "on").format()
 }
 
 def off() {
-	log.debug "Executing 'off'"
-	// TODO: handle 'off' command
+    log.debug "Executing 'off'"
+	zigbee.smartShield(text: "off").format()
 }
 
 def push() {
 	log.debug "Executing 'push'"
-        zigbee.smartShield(text: "pushRight").format()
+	zigbee.smartShield(text: "pushRight").format()
 }
 
 def setLevel() {
