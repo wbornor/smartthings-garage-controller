@@ -6,17 +6,15 @@
 #define PIN_THING_RX      3
 #define PIN_THING_TX      2
 #define PIN_RIGHT         4
-#define PIN_RIGHT_CONTACT 9
+#define PIN_EXTERIOR      9
 #define PIN_LEFT          7
-#define PIN_LEFT_CONTACT  8
+#define PIN_INTERIOR      8
 #define OPEN              HIGH
 #define CLOSED            LOW
 #define PUSH_DELAY      1000  // milliseconds to keep the button "pushed"
 
 SmartThingsCallout_t messageCallout;    // call out function forward decalaration
 SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // constructor
-
-bool  leftClosed, rightClosed;
 
 bool isDebugEnabled;    // enable or disable debug in this example
 int stateLED;           // state to track last set value of LED
@@ -44,35 +42,35 @@ void pushRight()
   Serial.println("rightDoor waiting");
 }
 
-bool isClosed(int pin)
+bool isPressed(int pin)
 {
   return (digitalRead(pin) == CLOSED);
 }
 
-void updateDoorState()
+void updateRelayState()
 {
-  if (leftClosed != isClosed(PIN_LEFT_CONTACT))
+  if (exteriorClosed != isPressed(PIN_EXTERIOR))
   {
-    leftClosed = isClosed(PIN_LEFT_CONTACT);
-    if(leftClosed)
+    exteriorClosed = isPressed(PIN_EXTERIOR);
+    if(exteriorClosed)
     {
-      smartthing.send("leftDoor closed");
-      Serial.println("leftDoor closed");
+      smartthing.send("exterior on");
+      Serial.println("exterior on");
     } else {
-      smartthing.send("leftDoor open");
-      Serial.println("leftDoor open");
+      smartthing.send("exterior off");
+      Serial.println("exterior off");
     }
   }
-  if (rightClosed != isClosed(PIN_RIGHT_CONTACT))
+  if (interiorClosed != isPressed(PIN_INTERIOR))
   {
-    rightClosed = isClosed(PIN_RIGHT_CONTACT);
-    if(rightClosed)
+    interiorClosed = isPressed(PIN_INTERIOR);
+    if(interiorClosed)
     {
-      smartthing.send("rightDoor closed");
-      Serial.println("rightDoor closed");
+      smartthing.send("interior pushed");
+      Serial.println("interior pushed");
     } else {
-      smartthing.send("rightDoor open");
-      Serial.println("rightDoor open");
+      smartthing.send("interior pushed");
+      Serial.println("interior pushed");
     }
   } 
 }
@@ -129,8 +127,8 @@ void setup()
   digitalWrite(PIN_LEFT, HIGH);
   digitalWrite(PIN_LED, LOW);   // set value to LOW (off) to match stateLED=0
   
-  pinMode(PIN_LEFT_CONTACT, INPUT_PULLUP);
-  pinMode(PIN_RIGHT_CONTACT, INPUT_PULLUP);
+  pinMode(PIN_EXTERIOR, INPUT_PULLUP);
+  pinMode(PIN_INTERIOR, INPUT_PULLUP);
   
   if (isDebugEnabled)
   { // setup debug serial port
@@ -140,26 +138,26 @@ void setup()
 
   // Get the Current State of the Doors
   Serial.println("Getting Door State...");
-  if (isClosed(PIN_LEFT_CONTACT))
+  if (isPressed(PIN_EXTERIOR))
   {
-    leftClosed = true;
-    smartthing.send("leftDoor closed");
-    Serial.println("leftDoor closed");
+    exteriorClosed = true;
+    smartthing.send("exterior pushed");
+    Serial.println("exterior pushed");
   } else {
-    leftClosed = false;
-    smartthing.send("leftDoor open");
-    Serial.println("leftDoor open");
+    exteriorClosed = false;
+    smartthing.send("exterior pushed");
+    Serial.println("exterior pushed");
   }
   
   delay(1000);
   
-  if (isClosed(PIN_RIGHT_CONTACT))
+  if (isPressed(PIN_INTERIOR))
   {
-    rightClosed = true;
+    interiorClosed = true;
     smartthing.send("rightDoor closed");
     Serial.println("rightDoor closed");
   } else {
-    rightClosed = false;
+    interiorClosed = false;
     smartthing.send("rightDoor open");
     Serial.println("rightDoor open");
   }
