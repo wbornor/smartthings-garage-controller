@@ -1,20 +1,16 @@
 //*****************************************************************************
 #include <SoftwareSerial.h>   
 
-#define PIN_LED           13
-#define PIN_MOTION        12
+#define PIN_MOTION        13
 #define OPEN              HIGH
 #define CLOSED            LOW
-#define PUSH_DELAY      1000  // milliseconds to keep the button "pushed"
 
 
 bool isDebugEnabled;    // enable or disable debug in this example
-int stateLED;           // state to track last set value of LED
-int stateNetwork;       // state of the network 
 
 
 
-bool isPressed(int pin)
+bool isOn(int pin)
 {
   return (digitalRead(pin) == CLOSED);
 }
@@ -39,9 +35,7 @@ void setup()
   isDebugEnabled = true;
 
   // setup hardware pins 
-  pinMode(PIN_LED, OUTPUT);     // define PIN_LED as an output
   pinMode(PIN_MOTION, INPUT);
-  digitalWrite(PIN_LED, LOW);   // set value to LOW (off) to match stateLED=0
   
   if (isDebugEnabled)
   { // setup debug serial port
@@ -51,7 +45,7 @@ void setup()
 
   // Get the Current State of the Relay
   Serial.println("Getting Relay State...");
-  if (isPressed(PIN_MOTION))
+  if (isOn(PIN_MOTION))
   {
     Serial.println("motion detected ");
   } else {
