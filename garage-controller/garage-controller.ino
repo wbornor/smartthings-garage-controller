@@ -55,8 +55,8 @@ void updateRelayState()
 {
   if (isPressed(PIN_INTERIOR))
   {  
-    smartthing.send("interiorlights pushed");
-    Serial.println("interiorlights pushed");
+    smartthing.send("switch on");
+    Serial.println("smartthing.send - switch on");
   } 
 }
 
