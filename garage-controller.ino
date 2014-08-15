@@ -49,29 +49,14 @@ bool isPressed(int pin)
 
 void updateRelayState()
 {
-  if (exteriorClosed != isPressed(PIN_EXTERIOR))
+  if (isPressed(PIN_EXTERIOR))
   {
-    exteriorClosed = isPressed(PIN_EXTERIOR);
-    if(exteriorClosed)
-    {
-      smartthing.send("exterior on");
-      Serial.println("exterior on");
-    } else {
-      smartthing.send("exterior off");
-      Serial.println("exterior off");
-    }
+      smartthing.send("switch on");
+      Serial.println("switch on");
   }
-  if (interiorClosed != isPressed(PIN_INTERIOR))
+  if (isPressed(PIN_INTERIOR))
   {
-    interiorClosed = isPressed(PIN_INTERIOR);
-    if(interiorClosed)
-    {
-      smartthing.send("interior pushed");
-      Serial.println("interior pushed");
-    } else {
-      smartthing.send("interior pushed");
-      Serial.println("interior pushed");
-    }
+    
   } 
 }
 
@@ -135,35 +120,6 @@ void setup()
     Serial.begin(9600);         // setup serial with a baud rate of 9600
     Serial.println("setup..");  // print out 'setup..' on start
   }
-
-  // Get the Current State of the Doors
-  Serial.println("Getting Door State...");
-  if (isPressed(PIN_EXTERIOR))
-  {
-    exteriorClosed = true;
-    smartthing.send("exterior pushed");
-    Serial.println("exterior pushed");
-  } else {
-    exteriorClosed = false;
-    smartthing.send("exterior pushed");
-    Serial.println("exterior pushed");
-  }
-  
-  delay(1000);
-  
-  if (isPressed(PIN_INTERIOR))
-  {
-    interiorClosed = true;
-    smartthing.send("rightDoor closed");
-    Serial.println("rightDoor closed");
-  } else {
-    interiorClosed = false;
-    smartthing.send("rightDoor open");
-    Serial.println("rightDoor open");
-  }
-
-  
-  
 }
 
 void loop()
@@ -171,8 +127,7 @@ void loop()
   // run smartthing logic
   smartthing.run();
   
-  // Check the open/closed state of the doors
-  //updateDoorState();
+  updateRelayState();
   
   // Code left here to help debut network connections
   setNetworkStateLED();
