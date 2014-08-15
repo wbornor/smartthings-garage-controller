@@ -1,0 +1,162 @@
+/**
+ *  Momentary Button Tile
+ *
+ *  Author: Wes Bornor
+ *
+ *  Date: 2013-05-01
+ */
+metadata {
+	// Automatically generated. Make future change here.
+	definition (name: "Arduino Shield Device Handler", author: "wbornor@gmail.com") {
+		fingerprint profileId: "0104", deviceId: "0138", inClusters: "0000"
+
+		capability "Switch"
+        capability "Momentary"
+        
+		command "pushLeft"
+		command "pushRight"
+	}
+
+	simulator {
+        // status messages
+        status "exteriorOn": "switch on"
+        status "exteriorOff": "switch off"
+        status "ping": "catchall: 0104 0000 01 01 0040 00 6A67 00 00 0000 0A 00 0A70696E67"
+		status "hello": "catchall: 0104 0000 01 01 0040 00 0A21 00 00 0000 0A 00 0A48656c6c6f20576f726c6421"
+
+        // reply messages
+        reply "zcl on-off on": "on/off: 1"
+        reply "zcl on-off off": "on/off: 0"
+    }
+
+	// UI tile definitions
+	tiles {
+		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
+            state "waiting", label: 'Chrissie', action: "pushRight", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
+			state "pushed", label: 'Chrissie', action: "pushLeft", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
+		}
+        
+        standardTile("switch", "device.switch", width: 1, height: 2, canChangeIcon: true) {
+            state "on", label:'${name}', action:"switch.off", icon:"st.switches.switch.on", backgroundColor:"#79b821", nextState:"turningOff"
+			state "off", label:'${name}', action:"switch.on", icon:"st.switches.switch.off", backgroundColor:"#ffffff", nextState:"turningOn"
+			state "turningOn", label:'${name}', icon:"st.switches.switch.on", backgroundColor:"#79b821"
+			state "turningOff", label:'${name}', icon:"st.switches.switch.off", backgroundColor:"#ffffff"
+        }
+        
+        standardTile("momentary", "device.momentary", width: 1, height: 2, canChangeIcon: true) {
+            state "waiting", label:'${name}', icon:"st.unknown.zwave.remote-controller", backgroundColor:"#ffffff", nextState: "pushed"
+            state "pushed", label:'${name}', action:"momentary.pushed", icon:"st.unknown.zwave.remote-controller", backgroundColor:"#79b821", nextState:"waiting"
+			
+        }
+        
+        standardTile("shield", "device.shield", width: 2, height: 2) {
+			state "default", icon:"st.shields.shields.arduino", backgroundColor:"#ffffff"
+		}
+
+        
+		main "momentary"
+		details (["momentary, rightDoor, switch, shield"])
+	}
+}
+
+def parse(String description) {
+	log.debug "parse - description: $description"
+    
+    /*def value = zigbee.parse(description)?.text
+    def name = value && value != "ping" ? "response" : null
+    def result = createEvent(name: name, value: value)
+    log.debug "Parse returned name: ${name}, value: ${value}"
+    return result*/
+    
+
+    /*if (description?.startsWith("exterior")) {
+    	def descMap = parseDescriptionAsMap(description)
+        log.debug "descMap: ${descMap}"
+    }*/
+
+	def msg = zigbee.parse(description)?.text
+    if(msg != "ping") {
+    	msg = msg.split()
+    }
+    //def msg = description.split()
+    def name = msg[0] 
+    def value = msg[1] 
+    def isStateChange = value != "ping"
+	def displayed = value && isStateChange
+    
+    def result = createEvent(name: name, value: value, isStateChange: isStateChange,
+		displayed: displayed)
+    log.debug "parse - result description: ${result?.descriptionText}"
+    log.debug "parse - name: ${name}, value: ${value}, isStateChange: ${isStateChange}, displayed: ${displayed}"
+    return result
+    
+    
+    /*
+    def name = null
+	def value = zigbee.parse(description)?.text
+    
+	def linkText = getLinkText(device)
+	def descriptionText = getDescriptionText(description, linkText, value)
+	def handlerName = value
+	def isStateChange = value != "ping"
+	def displayed = value && isStateChange
+    
+    def incoming_cmd = value.split()
+    
+    name = incoming_cmd[0]
+    value = incoming_cmd[1]
+    log.debug "name:${name}, value:${value}"
+    */
+	/*def result = [
+		value: value,
+        name: value != "ping" ? name : null,
+		handlerName: handlerName,
+		linkText: linkText,
+		descriptionText: descriptionText,
+		isStateChange: isStateChange,
+		displayed: displayed
+	]
+ 	log.debug result*/
+    /*
+    def result = createEvent(name: name, value: value, handlerName: handlerName,
+		linkText: linkText,
+		descriptionText: descriptionText,
+		isStateChange: isStateChange,
+		displayed: displayed)
+    log.debug "Parse returned ${result?.descriptionText}"
+	return result
+    */
+}
+
+def pushRight() {
+	log.debug "pushRight -  'pushRight'"
+    zigbee.smartShield(text: "pushRight").format()
+	//sendEvent(name: "garageB", value: "on", isStateChange: true, display: false)
+	//sendEvent(name: "garageB", value: "off", isStateChange: true, display: false)
+	//sendEvent(name: "momentary", value: "pushed", isStateChange: true)
+}
+
+
+def on() {
+	log.debug "on - executing 'exterior on'"
+
+}
+
+def off() {
+	log.debug "off - executing 'exterior off'"
+
+}
+
+def pushed() {
+	log.debug "pushed - executing 'pushed'"
+
+}
+
+def push() {
+    log.debug "push - executing 'push'"
+	sendEvent(name: "switch", value: "on", isStateChange: true, display: false)
+	sendEvent(name: "switch", value: "off", isStateChange: true, display: false)
+	sendEvent(name: "momentary", value: "pushed", isStateChange: true)
+    sendEvent(name: "momentary", value: "waiting", isStateChange: true)
+}
+
