@@ -1,0 +1,71 @@
+/**
+ *  Smart Garage
+ *
+ *  Author: wbornor@gmail.com
+ *  Date: 2014-03-10
+ */
+
+// Automatically generated. Make future change here.
+definition(
+    name: "Smart Garage App",
+    namespace: "",
+    author: "wbornor@gmail.com",
+    description: "Control Garage Lights and Doors",
+    category: "My Apps",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience%402x.png",
+    oauth: true)
+
+preferences {
+	section("When 'C' is pressed on the remote.") {
+        input "shield", "capability.switch"
+	}
+    section("External Garage Lights") {
+        input "externalLights", "capability.switch"
+	}
+    section("Interior Garage Lights") {
+        input "interiorLights", "capability.switch"
+	}
+    /*section("When 'D' is pressed on the remote.") {
+        input "shieldD", "capability.switch "
+	}*/
+}
+
+
+def installed() {
+	log.debug "Installed with settings: ${settings}"
+
+	initialize()
+}
+
+def updated() {
+	log.debug "Updated with settings: ${settings}"
+
+	unsubscribe()
+	initialize()
+}
+
+def initialize() {
+	// TODO: subscribe to attributes, devices, locations, etc.
+    subscribe(shield, "switch", shieldHandler)
+    //subscribe(shieldD, "switch", rightDoorHandler)
+}
+
+def shieldHandler(event) {
+	log.debug "shieldHandler - event.name: $event.name, event.value: $event.value"
+    //externalLights.on()
+    if (event.name == "switch"){
+        if (event.value == "on") {
+            externalLights.on()
+            interiorLights.on()
+        } else if (event.value == "off") {
+            externalLights.off()
+            interiorLights.off()
+        }
+    }
+}
+
+/*def rightDoorHandler(event) {
+	log.debug "rightDoorHandler - event.name: $event.name, event.value: $event.value"
+    
+}*/
