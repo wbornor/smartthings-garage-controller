@@ -55,8 +55,22 @@ void updateRelayState()
 {
   if (isPressed(PIN_INTERIOR))
   {  
-    smartthing.send("switch on");
-    Serial.println("smartthing.send - switch on");
+    
+    smartthing.shieldSetLED(2, 0, 0); // red
+    smartthing.shieldSetLED(0, 2, 0); // green
+    smartthing.shieldSetLED(0, 0, 2); // blue
+    smartthing.shieldSetLED(2, 0, 0); // red
+    smartthing.shieldSetLED(0, 2, 0); // green
+    smartthing.shieldSetLED(0, 0, 2); // blue
+    smartthing.shieldSetLED(0, 0, 0); // off
+    
+    smartthing.send("momentary pushed");
+    Serial.println("smartthing.send - momentary pushed");
+    
+    delay(500);
+    
+    smartthing.send("momentary waiting");
+    Serial.println("smartthing.send - momentary waiting");
   } 
 }
 
