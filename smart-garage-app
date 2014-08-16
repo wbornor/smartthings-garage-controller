@@ -5,7 +5,6 @@
  *  Date: 2014-03-10
  */
 
-// Automatically generated. Make future change here.
 definition(
     name: "Smart Garage App",
     namespace: "",
@@ -18,16 +17,16 @@ definition(
 
 preferences {
 	section("When 'C' is pressed on the remote.") {
-        input "shield", "capability.switch"
+        input "shield", "capability.momentary"
 	}
-    section("External Garage Lights") {
-        input "externalLights", "capability.switch"
+    section("Exterior Garage Lights") {
+        input "exteriorLights", "capability.switch"
 	}
     section("Interior Garage Lights") {
         input "interiorLights", "capability.switch"
 	}
     /*section("When 'D' is pressed on the remote.") {
-        input "shieldD", "capability.switch "
+        input "shield", "capability.switch "
 	}*/
 }
 
@@ -46,21 +45,34 @@ def updated() {
 }
 
 def initialize() {
-	// TODO: subscribe to attributes, devices, locations, etc.
+    //subscribe(shield, "switch", shieldHandler)
+    subscribe(shield, "momentary", shieldHandler)
     subscribe(shield, "switch", shieldHandler)
     //subscribe(shieldD, "switch", rightDoorHandler)
 }
 
 def shieldHandler(event) {
 	log.debug "shieldHandler - event.name: $event.name, event.value: $event.value"
-    //externalLights.on()
-    if (event.name == "switch"){
-        if (event.value == "on") {
-            externalLights.on()
+    if (event.value == "pushed"){
+        def interiorLightsState = interiorLights.currentState("switch")
+        log.debug "shieldHandler - interiorLightsState.value: $interiorLightsState.value"
+        if (interiorLightsState.value == "off") {
             interiorLights.on()
-        } else if (event.value == "off") {
-            externalLights.off()
+            log.debug "shieldHandler - sent on"
+        } else if (interiorLightsState.value == "on") {
             interiorLights.off()
+            log.debug "shieldHandler - sent off"
+        }
+    }
+    if (event.value == "on" || event.value == "off" ){
+        def exteriorLightsState = exteriorLights.currentState("switch")
+        log.debug "shieldHandler - exteriorLightsState.value: $exteriorLightsState.value"
+        if (exteriorLightsState.value == "off") {
+            exteriorLights.on()
+            log.debug "shieldHandler - sent on"
+        } else if (exteriorLightsState.value == "on") {
+            exteriorLights.off()
+            log.debug "shieldHandler - sent off"
         }
     }
 }
