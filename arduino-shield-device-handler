@@ -19,8 +19,9 @@ metadata {
 
 	simulator {
         // status messages
-        status "exteriorOn": "switch on"
-        status "exteriorOff": "switch off"
+        status "exteriorPush": "switch on"
+        //status "exteriorOff": "switch off"
+        status "interiorPush": "momentary pushed"
         status "ping": "catchall: 0104 0000 01 01 0040 00 6A67 00 00 0000 0A 00 0A70696E67"
 		status "hello": "catchall: 0104 0000 01 01 0040 00 0A21 00 00 0000 0A 00 0A48656c6c6f20576f726c6421"
 
@@ -31,7 +32,13 @@ metadata {
 
 	// UI tile definitions
 	tiles {
-		standardTile("rightDoor", "device.rightDoor", width: 2, height: 2, canChangeIcon: true) {
+		
+        standardTile("momentary", "device.momentary", width: 2, height: 2, canChangeIcon: true) {
+            state "waiting", label:'${name}', icon:"st.unknown.zwave.remote-controller", backgroundColor:"#ffffff", nextState: "pushed"
+            state "pushed", label:'${name}', action:"momentary.pushed", icon:"st.unknown.zwave.remote-controller", backgroundColor:"#79b821", nextState:"waiting"
+			
+        }
+        standardTile("rightDoor", "device.rightDoor", width: 1, height: 2, canChangeIcon: true) {
             state "waiting", label: 'Chrissie', action: "pushRight", icon:"st.doors.garage.garage-closed", backgroundColor: "#FFFFFF", nextState: "pushed"
 			state "pushed", label: 'Chrissie', action: "pushLeft", icon: "st.doors.garage.garage-closed", backgroundColor: "#ffa81e", nextState: "waiting"
 		}
@@ -43,18 +50,14 @@ metadata {
 			state "turningOff", label:'${name}', icon:"st.switches.switch.off", backgroundColor:"#ffffff"
         }
         
-        standardTile("momentary", "device.momentary", width: 1, height: 2, canChangeIcon: true) {
-            state "waiting", label:'${name}', icon:"st.unknown.zwave.remote-controller", backgroundColor:"#ffffff", nextState: "pushed"
-            state "pushed", label:'${name}', action:"momentary.pushed", icon:"st.unknown.zwave.remote-controller", backgroundColor:"#79b821", nextState:"waiting"
-			
-        }
         
-        standardTile("shield", "device.shield", width: 2, height: 2) {
+        
+        standardTile("shield", "device.shield", width: 1, height: 2) {
 			state "default", icon:"st.shields.shields.arduino", backgroundColor:"#ffffff"
 		}
 
         
-		main "momentary"
+		main "rightDoor"
 		details (["momentary, rightDoor, switch, shield"])
 	}
 }
@@ -131,6 +134,7 @@ def parse(String description) {
 def pushRight() {
 	log.debug "pushRight -  'pushRight'"
     zigbee.smartShield(text: "pushRight").format()
+    log.debug "pushRight -  done"
 	//sendEvent(name: "garageB", value: "on", isStateChange: true, display: false)
 	//sendEvent(name: "garageB", value: "off", isStateChange: true, display: false)
 	//sendEvent(name: "momentary", value: "pushed", isStateChange: true)
