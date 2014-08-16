@@ -6,8 +6,8 @@
 #define PIN_THING_RX      3
 #define PIN_THING_TX      2
 #define PIN_RIGHT         4
-#define PIN_EXTERIOR      9
-#define PIN_INTERIOR      A0
+#define PIN_C             A0
+#define PIN_D             A1
 #define PIN_LEFT          7
 #define HOT              HIGH
 #define COLD             LOW
@@ -19,6 +19,7 @@ SmartThings smartthing(PIN_THING_RX, PIN_THING_TX, messageCallout);  // construc
 bool isDebugEnabled;    // enable or disable debug in this example
 int stateLED;           // state to track last set value of LED
 int stateNetwork;       // state of the network 
+bool isOn;
 
 void pushLeft()
 {
@@ -51,11 +52,7 @@ bool isPressed(int pin)
   return (digitalRead(pin) == COLD);
 }
 
-void updateRelayState()
-{
-  if (isPressed(PIN_INTERIOR))
-  {  
-    
+void cycleLED() {
     smartthing.shieldSetLED(2, 0, 0); // red
     smartthing.shieldSetLED(0, 2, 0); // green
     smartthing.shieldSetLED(0, 0, 2); // blue
@@ -63,14 +60,58 @@ void updateRelayState()
     smartthing.shieldSetLED(0, 2, 0); // green
     smartthing.shieldSetLED(0, 0, 2); // blue
     smartthing.shieldSetLED(0, 0, 0); // off
+    smartthing.shieldSetLED(10, 0, 0); // red
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 10); // blue
+    smartthing.shieldSetLED(10, 0, 0); // red
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 10); // blue
+    smartthing.shieldSetLED(0, 0, 0); // off 
+}  
+  
+void updateRelayState()
+{
+  if (isPressed(PIN_C))
+  {  
+    smartthing.shieldSetLED(10, 0, 0); // red
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(10, 0, 0); // red
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(10, 0, 0); // red
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 0); // off
+   
     
     smartthing.send("momentary pushed");
     Serial.println("smartthing.send - momentary pushed");
     
-    delay(500);
+    delay(1000);
     
     smartthing.send("momentary waiting");
     Serial.println("smartthing.send - momentary waiting");
+  } 
+  
+  if (isPressed(PIN_D))
+  {  
+    smartthing.shieldSetLED(0, 0, 10); // blue
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 10); // blue
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 10); // blue
+    smartthing.shieldSetLED(0, 10, 0); // green
+    smartthing.shieldSetLED(0, 0, 0); // off
+    
+    if(isOn) 
+    {
+      smartthing.send("switch off");
+      Serial.println("smartthing.send - switch off");
+      isOn = false;
+    } else
+    {
+      smartthing.send("switch on");
+      Serial.println("smartthing.send - switch on"); 
+      isOn = true;
+    } 
   } 
 }
 
@@ -119,6 +160,7 @@ void setup()
   isDebugEnabled = true;
   stateLED = 0;                 // matches state of hardware pin set below
   stateNetwork = STATE_JOINED;  // set to joined to keep state off if off
+  isOn=true;
   
   // setup hardware pins 
   pinMode(PIN_LED, OUTPUT);     // define PIN_LED as an output
@@ -128,8 +170,8 @@ void setup()
   digitalWrite(PIN_LEFT, HIGH);
   digitalWrite(PIN_LED, LOW);   // set value to LOW (off) to match stateLED=0
   
-  pinMode(PIN_EXTERIOR, INPUT_PULLUP);
-  pinMode(PIN_INTERIOR, INPUT_PULLUP);
+  pinMode(PIN_D, INPUT_PULLUP);
+  pinMode(PIN_C, INPUT_PULLUP);
   
   if (isDebugEnabled)
   { // setup debug serial port
@@ -157,7 +199,7 @@ void loop()
   // Code left here to help debut network connections
   setNetworkStateLED();
   
-  delay(500);
+  delay(100);
 }
 
 void messageCallout(String message)
